@@ -544,6 +544,7 @@ columns = (
     "Employee",
     "Department",
     "Issue Type",
+    "Issue",
     "Priority",
     "Status",
     "Engineer",
@@ -576,6 +577,7 @@ tree.column("Time", width=120)
 tree.column("Employee", width=120)
 tree.column("Department", width=120)
 tree.column("Issue Type", width=130)
+tree.column("Issue", width=200)
 tree.column("Priority", width=90)
 tree.column("Status", width=100)
 tree.column("Engineer", width=100)
@@ -765,8 +767,8 @@ def load_data(search_text=""):
 
     for row in rows:
 
-        priority = row[6]
-        status = row[7]
+        priority = row[7]
+        status = row[8]
 
         tag = ""
 
