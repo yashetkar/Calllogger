@@ -415,6 +415,8 @@ tb.Button(
     )
 ).pack(side=LEFT)
 
+selected_ticket = None
+
 def load_selected_ticket(event):
 
     global selected_ticket
@@ -1164,7 +1166,6 @@ btn_frame.grid(
 )
 
 tb.Button(
-
     btn_frame,
     text="💾 Save Ticket",
     bootstyle="success-outline",
