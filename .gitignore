@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# SQLite databases
+database/
+*.db
+
+# Backups
+backup/
+
+# Exports
+exports/
+exports.txt
