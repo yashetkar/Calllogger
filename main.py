@@ -768,34 +768,73 @@ style.map(
 # ==========================
 employee_mapping = {}
 
+_last_csv_mtime = 0
+_last_xlsx_mtime = 0
+
 def sync_employees_from_file():
+    global _last_csv_mtime, _last_xlsx_mtime
+    
+    csv_file = None
+    xlsx_file = None
+    
     for folder in [".", "dist"]:
         csv_path = os.path.join(folder, "employees.csv")
         xlsx_path = os.path.join(folder, "employees.xlsx")
         
-        df = None
         if os.path.exists(csv_path):
-            try:
-                df = pd.read_csv(csv_path)
-            except Exception as e:
-                print(f"Error reading {csv_path}: {e}")
-        elif os.path.exists(xlsx_path):
-            try:
-                df = pd.read_excel(xlsx_path)
-            except Exception as e:
-                print(f"Error reading {xlsx_path}: {e}")
-                
-        if df is not None:
-            for _, row in df.iterrows():
-                name = str(row.get("Name", row.get("name", ""))).strip()
-                email = str(row.get("Email", row.get("email", ""))).strip()
-                dept = str(row.get("Department", row.get("department", ""))).strip()
-                
-                if name and name.lower() != "nan":
-                    email_clean = email if email.lower() != "nan" else ""
-                    dept_clean = dept if dept.lower() != "nan" else ""
-                    upsert_employee(name, email_clean, dept_clean)
+            csv_file = csv_path
             break
+        elif os.path.exists(xlsx_path):
+            xlsx_file = xlsx_path
+            break
+            
+    if not csv_file and not xlsx_file:
+        return
+        
+    # Check if files have actually changed
+    if csv_file:
+        try:
+            mtime = os.path.getmtime(csv_file)
+            if mtime <= _last_csv_mtime:
+                return  # File has not changed, skip sync
+            _last_csv_mtime = mtime
+        except Exception:
+            pass
+    elif xlsx_file:
+        try:
+            mtime = os.path.getmtime(xlsx_file)
+            if mtime <= _last_xlsx_mtime:
+                return  # File has not changed, skip sync
+            _last_xlsx_mtime = mtime
+        except Exception:
+            pass
+
+    df = None
+    if csv_file:
+        try:
+            df = pd.read_csv(csv_file)
+        except Exception as e:
+            print(f"Error reading {csv_file}: {e}")
+    elif xlsx_file:
+        try:
+            df = pd.read_excel(xlsx_file)
+        except Exception as e:
+            print(f"Error reading {xlsx_file}: {e}")
+            
+    if df is not None:
+        employee_list = []
+        for _, row in df.iterrows():
+            name = str(row.get("Name", row.get("name", ""))).strip()
+            email = str(row.get("Email", row.get("email", ""))).strip()
+            dept = str(row.get("Department", row.get("department", ""))).strip()
+            
+            if name and name.lower() != "nan":
+                email_clean = email if email.lower() != "nan" else ""
+                dept_clean = dept if dept.lower() != "nan" else ""
+                employee_list.append((name, email_clean, dept_clean))
+                
+        if employee_list:
+            bulk_upsert_employees(employee_list)
 
 def get_employee_mapping():
     try:

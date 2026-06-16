@@ -254,6 +254,37 @@ def upsert_employee(name, email, department):
     finally:
         conn.close()
 
+def bulk_upsert_employees(employee_list):
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
+        # Run everything in a single transaction
+        for name, email, department in employee_list:
+            name = name.strip()
+            if not name:
+                continue
+            email = email.strip() if email else ""
+            department = department.strip() if department else ""
+            
+            cur.execute("SELECT id FROM employees WHERE name = ?", (name,))
+            row = cur.fetchone()
+            if row:
+                cur.execute("""
+                    UPDATE employees
+                    SET email = ?, department = ?
+                    WHERE id = ?
+                """, (email, department, row[0]))
+            else:
+                cur.execute("""
+                    INSERT INTO employees (name, email, department)
+                    VALUES (?, ?, ?)
+                """, (name, email, department))
+        conn.commit()
+    except Exception as e:
+        print(f"Error in bulk upsert: {e}")
+    finally:
+        conn.close()
+
 def get_all_employees():
     conn = get_connection()
     try:
