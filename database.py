@@ -33,198 +33,200 @@ def get_connection():
 def init_db():
 
     conn = get_connection()
-    cur = conn.cursor()
+    try:
+        cur = conn.cursor()
 
-    os.makedirs("backup", exist_ok=True)
+        os.makedirs("backup", exist_ok=True)
 
-    if os.path.exists(DB_PATH):
+        if os.path.exists(DB_PATH):
 
-        backup_name = datetime.now().strftime(
-            "backup/helpdesk_%Y%m%d.db"
+            backup_name = datetime.now().strftime(
+                "backup/helpdesk_%Y%m%d.db"
+            )
+
+            if not os.path.exists(backup_name):
+                shutil.copy(DB_PATH, backup_name)
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS call_logs(
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            ticket_no TEXT UNIQUE,
+
+            log_date TEXT,
+            call_time TEXT,
+
+            employee_name TEXT,
+            employee_email TEXT,
+            department TEXT,
+            issue_type TEXT,
+
+            issue TEXT,
+
+            priority TEXT CHECK(
+                priority IN (
+                    'Low',
+                    'Medium',
+                    'High',
+                    'Critical'
+                )
+            ),
+
+            status TEXT CHECK(
+                status IN (
+                    'Open',
+                    'In Progress',
+                    'Resolved',
+                    'Closed'
+                )
+            ),
+
+            remarks TEXT,
+            engineer TEXT,
+
+            resolved_date TEXT,
+            resolved_time TEXT,
+
+            resolved_email_sent INTEGER DEFAULT 0,
+            engineer_email TEXT,
+
+            deleted INTEGER DEFAULT 0,
+
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+        """)
 
-        if not os.path.exists(backup_name):
-            shutil.copy(DB_PATH, backup_name)
+        # Migration for existing databases
+        try:
+            cur.execute("ALTER TABLE call_logs ADD COLUMN resolved_email_sent INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS call_logs(
+        try:
+            cur.execute("ALTER TABLE call_logs ADD COLUMN employee_email TEXT")
+        except sqlite3.OperationalError:
+            pass
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        try:
+            cur.execute("ALTER TABLE call_logs ADD COLUMN engineer_email TEXT")
+        except sqlite3.OperationalError:
+            pass
 
-        ticket_no TEXT UNIQUE,
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_ticket
+        ON call_logs(ticket_no)
+        """)
 
-        log_date TEXT,
-        call_time TEXT,
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_employee
+        ON call_logs(employee_name)
+        """)
 
-        employee_name TEXT,
-        employee_email TEXT,
-        department TEXT,
-        issue_type TEXT,
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_status
+        ON call_logs(status)
+        """)
 
-        issue TEXT,
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_priority
+        ON call_logs(priority)
+        """)
 
-        priority TEXT CHECK(
-            priority IN (
-                'Low',
-                'Medium',
-                'High',
-                'Critical'
-            )
-        ),
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_engineer
+        ON call_logs(engineer)
+        """)
 
-        status TEXT CHECK(
-            status IN (
-                'Open',
-                'In Progress',
-                'Resolved',
-                'Closed'
-            )
-        ),
+        # Create departments lookup table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS departments(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE
+        )
+        """)
 
-        remarks TEXT,
-        engineer TEXT,
+        # Create issue_types lookup table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS issue_types(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE
+        )
+        """)
 
-        resolved_date TEXT,
-        resolved_time TEXT,
+        # Create settings table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS settings(
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )
+        """)
 
-        resolved_email_sent INTEGER DEFAULT 0,
-        engineer_email TEXT,
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS email_logs(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_no TEXT,
+            recipient TEXT,
+            subject TEXT,
+            status TEXT,
+            sent_time TEXT,
+            error_message TEXT
+        )
+        """)
 
-        deleted INTEGER DEFAULT 0,
+        # Populate default departments
+        default_departments = ["sourcing", "HR", "accounts", "Sales", "IT"]
+        for dept in default_departments:
+            cur.execute("INSERT OR IGNORE INTO departments (name) VALUES (?)", (dept,))
 
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+        # Populate default issue types
+        default_issue_types = [
+            "Email Issue",
+            "Application Issue",
+            "Password Reset",
+            "Printer Issue",
+            "VPN Issue",
+            "Internet Issue",
+            "Network Issue",
+            "System Slow",
+            "Software Installation",
+            "Hardware Issue",
+            "Access Request",
+            "Others"
+        ]
+        for issue in default_issue_types:
+            cur.execute("INSERT OR IGNORE INTO issue_types (name) VALUES (?)", (issue,))
 
-    # Migration for existing databases
-    try:
-        cur.execute("ALTER TABLE call_logs ADD COLUMN resolved_email_sent INTEGER DEFAULT 0")
-    except sqlite3.OperationalError:
-        pass
+        # Populate default settings
+        default_settings = [
+            ("email_enabled", "0"),
+            ("smtp_host", "smtp.gmail.com"),
+            ("smtp_port", "587"),
+            ("smtp_user", ""),
+            ("smtp_password", ""),
+            ("smtp_use_tls", "1")
+        ]
+        for key, val in default_settings:
+            cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (key, val))
 
-    try:
-        cur.execute("ALTER TABLE call_logs ADD COLUMN employee_email TEXT")
-    except sqlite3.OperationalError:
-        pass
+        # Create employees lookup table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS employees(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
+            email TEXT,
+            department TEXT
+        )
+        """)
 
-    try:
-        cur.execute("ALTER TABLE call_logs ADD COLUMN engineer_email TEXT")
-    except sqlite3.OperationalError:
-        pass
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_employees_name
+        ON employees(name)
+        """)
 
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_ticket
-    ON call_logs(ticket_no)
-    """)
-
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_employee
-    ON call_logs(employee_name)
-    """)
-
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_status
-    ON call_logs(status)
-    """)
-
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_priority
-    ON call_logs(priority)
-    """)
-
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_engineer
-    ON call_logs(engineer)
-    """)
-
-    # Create departments lookup table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS departments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE
-    )
-    """)
-
-    # Create issue_types lookup table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS issue_types(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE
-    )
-    """)
-
-    # Create settings table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS settings(
-        key TEXT PRIMARY KEY,
-        value TEXT
-    )
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS email_logs(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        ticket_no TEXT,
-        recipient TEXT,
-        subject TEXT,
-        status TEXT,
-        sent_time TEXT,
-        error_message TEXT
-    )
-    """)
-
-    # Populate default departments
-    default_departments = ["sourcing", "HR", "accounts", "Sales", "IT"]
-    for dept in default_departments:
-        cur.execute("INSERT OR IGNORE INTO departments (name) VALUES (?)", (dept,))
-
-    # Populate default issue types
-    default_issue_types = [
-        "Email Issue",
-        "Application Issue",
-        "Password Reset",
-        "Printer Issue",
-        "VPN Issue",
-        "Internet Issue",
-        "Network Issue",
-        "System Slow",
-        "Software Installation",
-        "Hardware Issue",
-        "Access Request",
-        "Others"
-    ]
-    for issue in default_issue_types:
-        cur.execute("INSERT OR IGNORE INTO issue_types (name) VALUES (?)", (issue,))
-
-    # Populate default settings
-    default_settings = [
-        ("email_enabled", "0"),
-        ("smtp_host", "smtp.gmail.com"),
-        ("smtp_port", "587"),
-        ("smtp_user", ""),
-        ("smtp_password", ""),
-        ("smtp_use_tls", "1")
-    ]
-    for key, val in default_settings:
-        cur.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (key, val))
-
-    # Create employees lookup table
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS employees(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE,
-        email TEXT,
-        department TEXT
-    )
-    """)
-
-    cur.execute("""
-    CREATE INDEX IF NOT EXISTS idx_employees_name
-    ON employees(name)
-    """)
-
-    conn.commit()
-    conn.close()
+        conn.commit()
+    finally:
+        conn.close()
 
 def upsert_employee(name, email, department):
     name = name.strip()

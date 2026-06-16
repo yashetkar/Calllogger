@@ -13,6 +13,12 @@ from email.mime.multipart import MIMEMultipart
 import re
 
 # ==========================
+# CONSTANTS
+# ==========================
+DATE_FORMAT = "%d-%m-%Y"
+TIME_FORMAT = "%I:%M %p"
+
+# ==========================
 # DATABASE INITIALIZATION
 # ==========================
 
@@ -113,7 +119,7 @@ tb.Label(
     font=("Segoe UI", 8, "bold")
 ).grid(row=0, column=2, padx=5, pady=3, sticky="e")
 
-date_entry = tb.DateEntry(form, dateformat="%d-%m-%Y", width=12)
+date_entry = tb.DateEntry(form, dateformat=DATE_FORMAT, width=12)
 date_entry.grid(
     row=0,
     column=3,
@@ -125,7 +131,7 @@ date_entry.grid(
 date_entry.entry.delete(0, "end")
 date_entry.entry.insert(   
     0,
-    datetime.now().strftime("%d-%m-%Y")
+    datetime.now().strftime(DATE_FORMAT)
 )
 
 tb.Label(
@@ -151,7 +157,7 @@ call_time_entry.pack(side=LEFT, fill=X, expand=True)
 
 def set_call_time_now():
     call_time_entry.delete(0, END)
-    call_time_entry.insert(0, datetime.now().strftime("%I:%M %p"))
+    call_time_entry.insert(0, datetime.now().strftime(TIME_FORMAT))
 
 call_time_now_btn = tb.Button(
     call_time_frame,
@@ -164,7 +170,7 @@ call_time_now_btn.pack(side=LEFT, padx=(2, 0))
 
 call_time_entry.insert(
     0,
-    datetime.now().strftime("%I:%M %p")
+    datetime.now().strftime(TIME_FORMAT)
 )
 # Priority
 
@@ -256,7 +262,7 @@ tb.Label(
 
 resolved_date_entry = tb.DateEntry(
     form,
-    dateformat="%d-%m-%Y",
+    dateformat=DATE_FORMAT,
     width=12
 )
 
@@ -291,7 +297,7 @@ resolved_time_entry.pack(side=LEFT, fill=X, expand=True)
 
 def set_resolved_time_now():
     resolved_time_entry.delete(0, END)
-    resolved_time_entry.insert(0, datetime.now().strftime("%I:%M %p"))
+    resolved_time_entry.insert(0, datetime.now().strftime(TIME_FORMAT))
 
 resolved_time_now_btn = tb.Button(
     resolved_time_frame,
@@ -927,10 +933,10 @@ def on_status_change(event):
     if status in ("Resolved", "Closed"):
         if not resolved_date_entry.entry.get().strip():
             resolved_date_entry.entry.delete(0, END)
-            resolved_date_entry.entry.insert(0, datetime.now().strftime("%d-%m-%Y"))
+            resolved_date_entry.entry.insert(0, datetime.now().strftime(DATE_FORMAT))
         if not resolved_time_entry.get().strip():
             resolved_time_entry.delete(0, END)
-            resolved_time_entry.insert(0, datetime.now().strftime("%I:%M %p"))
+            resolved_time_entry.insert(0, datetime.now().strftime(TIME_FORMAT))
     else:
         resolved_date_entry.entry.delete(0, END)
         resolved_time_entry.delete(0, END)
@@ -1096,7 +1102,7 @@ IT Helpdesk Support
                 details['employee_email'],
                 subject,
                 "SUCCESS",
-                datetime.now().strftime("%d-%m-%Y %I:%M %p")
+                datetime.now().strftime(f"{DATE_FORMAT} {TIME_FORMAT}")
             ))
             conn.commit()
             conn.close()
@@ -1122,7 +1128,7 @@ IT Helpdesk Support
                 details['employee_email'],
                 subject,
                 "FAILED",
-                datetime.now().strftime("%d-%m-%Y %I:%M %p"),
+                datetime.now().strftime(f"{DATE_FORMAT} {TIME_FORMAT}"),
                 str(ex)
             ))
 
@@ -1428,10 +1434,10 @@ def clear_form():
     ticket_no_entry.insert(0, get_next_ticket())
 
     date_entry.entry.delete(0, END)
-    date_entry.entry.insert(0, datetime.now().strftime("%d-%m-%Y"))
+    date_entry.entry.insert(0, datetime.now().strftime(DATE_FORMAT))
 
     call_time_entry.delete(0, END)
-    call_time_entry.insert(0, datetime.now().strftime("%I:%M %p"))
+    call_time_entry.insert(0, datetime.now().strftime(TIME_FORMAT))
 
     employee_entry.delete(0, END)
     engineer_entry.delete(0, END)
@@ -1457,7 +1463,7 @@ def validate_time_format(time_str):
     if not time_str:
         return True
     try:
-        datetime.strptime(time_str, "%I:%M %p")
+        datetime.strptime(time_str, TIME_FORMAT)
         return True
     except ValueError:
         return False
@@ -1497,11 +1503,11 @@ def save_record():
     # Auto-populate resolved date and time if status is set to Resolved/Closed
     if status in ("Resolved", "Closed"):
         if not resolved_date:
-            resolved_date = datetime.now().strftime("%d-%m-%Y")
+            resolved_date = datetime.now().strftime(DATE_FORMAT)
             resolved_date_entry.entry.delete(0, END)
             resolved_date_entry.entry.insert(0, resolved_date)
         if not resolved_time:
-            resolved_time = datetime.now().strftime("%I:%M %p")
+            resolved_time = datetime.now().strftime(TIME_FORMAT)
             resolved_time_entry.delete(0, END)
             resolved_time_entry.insert(0, resolved_time)
     else:
@@ -1528,7 +1534,7 @@ def save_record():
     # Validate date formats
     log_date_str = date_entry.entry.get().strip()
     try:
-        datetime.strptime(log_date_str, "%d-%m-%Y")
+        datetime.strptime(log_date_str, DATE_FORMAT)
     except ValueError:
         messagebox.showerror(
             "Invalid Date",
@@ -1538,7 +1544,7 @@ def save_record():
 
     if resolved_date:
         try:
-            datetime.strptime(resolved_date, "%d-%m-%Y")
+            datetime.strptime(resolved_date, DATE_FORMAT)
         except ValueError:
             messagebox.showerror(
                 "Invalid Date",
