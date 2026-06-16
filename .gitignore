@@ -19,3 +19,15 @@ backup/
 # Exports
 exports/
 exports.txt
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# History and logs
+history/
+
+# Local CSV/Excel data files
+employees.csv
+employees.xlsx
