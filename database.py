@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import shutil
+import re
 from datetime import datetime
 
 CONFIG_PATH = "config.txt"
@@ -70,7 +71,7 @@ def init_db():
                     'Medium',
                     'High',
                     'Critical'
-                )
+                ) 
             ),
 
             status TEXT CHECK(
@@ -112,6 +113,17 @@ def init_db():
             cur.execute("ALTER TABLE call_logs ADD COLUMN engineer_email TEXT")
         except sqlite3.OperationalError:
             pass
+
+        try:
+            cur.execute("ALTER TABLE call_logs ADD COLUMN rating TEXT")
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cur.execute("ALTER TABLE call_logs ADD COLUMN rating_time TEXT")
+        except sqlite3.OperationalError:
+            pass
+
 
         cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_ticket
@@ -228,15 +240,20 @@ def init_db():
     finally:
         conn.close()
 
-def upsert_employee(name, email, department):
+def upsert_employee(name, email, department, cur=None):
     name = name.strip()
     if not name:
         return
     email = email.strip() if email else ""
     department = department.strip() if department else ""
-    conn = get_connection()
-    try:
+    
+    should_close = False
+    if cur is None:
+        conn = get_connection()
         cur = conn.cursor()
+        should_close = True
+        
+    try:
         cur.execute("SELECT id FROM employees WHERE name = ?", (name,))
         row = cur.fetchone()
         if row:
@@ -250,11 +267,16 @@ def upsert_employee(name, email, department):
                 INSERT INTO employees (name, email, department)
                 VALUES (?, ?, ?)
             """, (name, email, department))
-        conn.commit()
+            
+        if should_close:
+            conn.commit()
     except Exception as e:
         print(f"Error upserting employee: {e}")
+        if should_close:
+            conn.rollback()
     finally:
-        conn.close()
+        if should_close:
+            conn.close()
 
 def bulk_upsert_employees(employee_list):
     conn = get_connection()
@@ -262,28 +284,11 @@ def bulk_upsert_employees(employee_list):
         cur = conn.cursor()
         # Run everything in a single transaction
         for name, email, department in employee_list:
-            name = name.strip()
-            if not name:
-                continue
-            email = email.strip() if email else ""
-            department = department.strip() if department else ""
-            
-            cur.execute("SELECT id FROM employees WHERE name = ?", (name,))
-            row = cur.fetchone()
-            if row:
-                cur.execute("""
-                    UPDATE employees
-                    SET email = ?, department = ?
-                    WHERE id = ?
-                """, (email, department, row[0]))
-            else:
-                cur.execute("""
-                    INSERT INTO employees (name, email, department)
-                    VALUES (?, ?, ?)
-                """, (name, email, department))
+            upsert_employee(name, email, department, cur)
         conn.commit()
     except Exception as e:
         print(f"Error in bulk upsert: {e}")
+        conn.rollback()
     finally:
         conn.close()
 
@@ -300,23 +305,34 @@ def get_all_employees():
         conn.close()
 
 def get_next_ticket():
-
     conn = get_connection()
+    max_num = 0
     try:
         cur = conn.cursor()
-
-        cur.execute(
-            "SELECT MAX(id) FROM call_logs"
-        )
-
-        last_id = cur.fetchone()[0]
+        cur.execute("SELECT ticket_no FROM call_logs")
+        rows = cur.fetchall()
+        for (t_no,) in rows:
+            if t_no:
+                match = re.search(r'\d+', str(t_no))
+                if match:
+                    try:
+                        num = int(match.group(0))
+                        if num > max_num:
+                            max_num = num
+                    except ValueError:
+                        pass
+        if max_num == 0:
+            cur.execute("SELECT MAX(id) FROM call_logs")
+            row = cur.fetchone()
+            if row and row[0]:
+                max_num = row[0]
+    except Exception as e:
+        print(f"Error computing next ticket number: {e}")
     finally:
         conn.close()
 
-    if last_id is None:
-        last_id = 0
+    return f"TKT-{max_num + 1:06d}"
 
-    return f"TKT-{last_id + 1:06d}"
 
 def get_departments():
     conn = get_connection()
@@ -344,8 +360,9 @@ def get_setting(key, default=""):
         cur = conn.cursor()
         cur.execute("SELECT value FROM settings WHERE key=?", (key,))
         row = cur.fetchone()
-        return row[0] if row else default
-    except sqlite3.OperationalError:
+        return row[0] if (row is not None and row[0] is not None) else default
+    except Exception as e:
+        print(f"Database error loading setting '{key}': {e}")
         return default
     finally:
         conn.close()
@@ -356,5 +373,11 @@ def set_setting(key, value):
         cur = conn.cursor()
         cur.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (key, str(value)))
         conn.commit()
+    except Exception as e:
+        print(f"Database error saving setting '{key}': {e}")
+        try:
+            conn.rollback()
+        except Exception:
+            pass
     finally:
         conn.close()

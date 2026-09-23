@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
+    <title>&#8203;</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/css/styles.css?v=2.2">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="alternate icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <span class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div class="header-titles">
+                    <h1>IT OPERATIONS CENTER</h1>
+                    <span class="header-subtitle">Helpdesk Call Logger</span>
+                </div>
+            </div>
+
+            <!-- Dashboard / Counters -->
+            <div class="dashboard-panel" aria-label="Dashboard metrics">
+                <div class="metric-card total" id="metric-total-card">
+                    <div class="metric-content">
+                        <span class="metric-label">TOTAL TICKETS</span>
+                        <span class="metric-value" id="metric-total">0</span>
+                    </div>
+                </div>
+                <div class="metric-card open" id="metric-open-card">
+                    <div class="metric-content">
+                        <span class="metric-label">OPEN &amp; IN PROGRESS</span>
+                        <span class="metric-value" id="metric-open">0</span>
+                    </div>
+                </div>
+                <div class="metric-card resolved" id="metric-resolved-card">
+                    <div class="metric-content">
+                        <span class="metric-label">RESOLVED</span>
+                        <span class="metric-value" id="metric-resolved">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="header-clock" id="header-clock">--:--:--</div>
+                <button id="btn-open-settings" class="btn-icon" title="Email Settings" aria-label="Email settings">
+                    <span class="theme-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </span>
+                </button>
+                <button id="theme-toggle" class="btn-icon" title="Toggle Light/Dark Mode" aria-label="Toggle theme">
+                    <span class="theme-icon">
+                        <!-- Default moon icon, JS will toggle this inline -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace (Top-Down Layout) -->
+        <main class="workspace-grid-vertical">
+            <!-- Ticket Details Form Card -->
+            <section class="form-section card" aria-labelledby="form-title">
+                <div class="card-header">
+                    <h2 id="form-title">TICKET DETAILS</h2>
+                    <span class="mode-badge" id="form-mode">NEW TICKET</span>
+                </div>
+                <form id="ticket-form" autocomplete="off">
+                    <div class="form-body-wrapper">
+                        <!-- Left Panel: 12 Grid Fields (2 Columns layout) + Collapsible Section -->
+                        <div class="fields-grid-left">
+                            
+                            <div class="form-group">
+                                <label for="ticket_no">TICKET NO</label>
+                                <input type="text" id="ticket_no" name="ticket_no" readonly placeholder="Generating...">
+                            </div>
+                            <div class="form-group">
+                                <label for="status">STATUS</label>
+                                <select id="status" name="status" required tabindex="8">
+                                    <option value="In Progress" selected>In Progress</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="log_date">DATE</label>
+                                <div class="input-with-btn">
+                                    <input type="text" id="log_date" name="log_date" required placeholder="DD-MM-YYYY" tabindex="1">
+                                    <button type="button" id="btn-date-calendar" class="btn-inline" title="Open Calendar" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+                                    <input type="date" id="log_date_picker" style="position: absolute; visibility: hidden; width: 0; height: 0;" tabindex="-1">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="call_time">CALL TIME</label>
+                                <div class="input-with-btn">
+                                    <input type="text" id="call_time" name="call_time" required placeholder="HH:MM AM/PM" tabindex="2">
+                                    <button type="button" id="btn-time-now" class="btn-inline" tabindex="-1">Now</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group autocomplete span-2">
+                                <label for="employee_name">EMPLOYEE</label>
+                                <input type="text" id="employee_name" name="employee_name" required placeholder="Search or type employee..." tabindex="3">
+                                <div id="autocomplete-list" class="autocomplete-items"></div>
+                            </div>
+
+                            <div class="form-group span-2">
+                                <label for="employee_email">EMPLOYEE EMAIL</label>
+                                <input type="email" id="employee_email" name="employee_email" placeholder="employee@company.com" tabindex="9">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="department">DEPARTMENT</label>
+                                <select id="department" name="department" required tabindex="4">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">PRIORITY</label>
+                                <select id="priority" name="priority" required tabindex="5">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High" selected>High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group span-2">
+                                <label for="engineer">ENGINEER</label>
+                                <input type="text" id="engineer" name="engineer" required placeholder="Assigned engineer..." tabindex="6">
+                            </div>
+
+                            <div class="form-group span-2">
+                                <label for="engineer_email">ENGINEER EMAIL</label>
+                                <input type="email" id="engineer_email" name="engineer_email" placeholder="engineer@company.com" tabindex="10">
+                            </div>
+
+                            <div class="form-group span-2">
+                                <label for="issue_type">ISSUE TYPE</label>
+                                <select id="issue_type" name="issue_type" required tabindex="7">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="form-group span-2">
+                                <label for="issue">ISSUE</label>
+                                <textarea id="issue" name="issue" rows="2" required placeholder="Describe the issue..." tabindex="11"></textarea>
+                            </div>
+
+
+                            <!-- RESOLVED SECTION (Progressive Disclosure - Hidden by default) -->
+                            <div id="resolved-section" class="resolved-fields-group hidden">
+                                <div class="form-group">
+                                    <label for="resolved_date">RESOLVED DATE</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" id="resolved_date" name="resolved_date" placeholder="DD-MM-YYYY" tabindex="13">
+                                        <button type="button" id="btn-resolved-date-calendar" class="btn-inline" title="Open Calendar" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+                                        <input type="date" id="resolved_date_picker" style="position: absolute; visibility: hidden; width: 0; height: 0;" tabindex="-1">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resolved_time">RESOLVED TIME</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" id="resolved_time" name="resolved_time" placeholder="HH:MM AM/PM" tabindex="14">
+                                        <button type="button" id="btn-resolved-now" class="btn-inline" tabindex="-1">Now</button>
+                                    </div>
+                                </div>
+                                <div class="form-group span-2">
+                                    <label for="remarks">REMARKS</label>
+                                    <textarea id="remarks" name="remarks" rows="2" placeholder="Enter remarks..." tabindex="15"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Bottom Actions Row -->
+                    <div class="form-actions-row">
+                        <div class="actions-left">
+                            <!-- Helper text or notification placeholder if needed -->
+                        </div>
+                        <div class="actions-right">
+                            <button type="button" id="btn-clear" class="btn btn-outline" tabindex="16">CLEAR FORM</button>
+                            <button type="submit" id="btn-save" class="btn btn-primary" tabindex="17">SAVE TICKET</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Ticket Log Table Card -->
+            <section class="table-section card" aria-labelledby="table-title">
+                <div class="card-header">
+                    <h2 id="table-title">TICKET LOG</h2>
+                    <div class="table-actions">
+                        <button type="button" id="btn-edit" class="btn btn-outline btn-sm">EDIT SELECTED</button>
+                        <button type="button" id="btn-resend-email" class="btn btn-outline btn-sm" title="Resend email notification for selected ticket">RESEND EMAIL</button>
+                        <button type="button" id="btn-delete" class="btn btn-danger-outline btn-sm">DELETE SELECTED</button>
+                        <button type="button" id="btn-export" class="btn btn-outline btn-sm">EXPORT EXCEL</button>
+                    </div>
+                </div>
+
+                <!-- Search & Filters Container (Horizontal layout) -->
+                <div class="filter-bar">
+                    <div class="search-box-wrapper">
+                        <input type="text" id="search-input" placeholder="Search ticket, employee, issue, engineer, dept...">
+                        <button type="button" id="btn-search-submit" class="btn btn-dark btn-sm">SEARCH TICKET</button>
+                    </div>
+                    <div class="filter-box">
+                        <label for="status-filter">FILTER BY STATUS:</label>
+                        <select id="status-filter">
+                            <option value="All">All</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Responsive Table Wrapper -->
+                <div class="table-responsive">
+                    <table id="tickets-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket</th>
+                                <th>Employee</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Resolved Date</th>
+                                <th>Resolved Time</th>
+                                <th>Department</th>
+                                <th>Issue</th>
+                                <th>Issue Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Engineer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-tbody">
+                            <!-- Data rows injected dynamically -->
+                        </tbody>
+                    </table>
+                    <div id="no-data" class="no-data-msg hidden">
+                        No matching tickets found.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Email Settings Modal Dialog -->
+    <div id="settings-modal" class="modal-backdrop hidden" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-content card">
+            <div class="card-header">
+                <h3 id="modal-title" style="display: flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    EMAIL NOTIFICATION SETTINGS
+                </h3>
+                <button type="button" id="btn-close-modal" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="settings-form">
+                    <!-- Enable Notifications Toggle -->
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="email_enabled" name="email_enabled">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label">Enable Email Notifications</span>
+                    </div>
+
+                    <div class="form-grid modal-grid">
+                        <div class="form-group">
+                            <label for="smtp_host">SMTP Host</label>
+                            <input type="text" id="smtp_host" name="smtp_host" required placeholder="smtp.gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtp_port">SMTP Port</label>
+                            <input type="number" id="smtp_port" name="smtp_port" required placeholder="587">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="smtp_user">Sender Email</label>
+                            <input type="email" id="smtp_user" name="smtp_user" required placeholder="your-email@gmail.com">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="smtp_password">Sender Password / App Password</label>
+                            <input type="password" id="smtp_password" name="smtp_password" required placeholder="••••••••••••••••">
+                        </div>
+                        <div class="toggle-group-inline full-width">
+                            <input type="checkbox" id="smtp_use_tls" name="smtp_use_tls" checked>
+                            <label for="smtp_use_tls">Use TLS (recommended for port 587)</label>
+                        </div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <!-- Test Recipient Configuration -->
+                    <div class="form-group full-width">
+                        <label for="test_recipient">Test Recipient Email</label>
+                        <input type="email" id="test_recipient" placeholder="recipient@example.com">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="btn-test-connection" class="btn btn-warning" style="background-color: var(--warning); color: var(--text-white);">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 4px; display: inline-block; vertical-align: middle;"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            TEST CONNECTION
+                        </button>
+                        <div class="action-right-btns">
+                            <button type="button" id="btn-save-settings" class="btn btn-success" style="background-color: var(--success); color: var(--text-white);">Save</button>
+                            <button type="button" id="btn-cancel-settings" class="btn btn-outline">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Banner / Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Script Entrypoint -->
+    <script src="/static/js/app.js?v=2.0"></script>
+    <script>
+        // Keep-alive heartbeat ping to shutdown server when browser window closes
+        function sendPing() {
+            fetch('/api/ping', { 
+                method: 'POST'
+            }).catch(err => {});
+        }
+        sendPing();
+        setInterval(sendPing, 3000);
+
+        window.addEventListener('beforeunload', () => {
+            navigator.sendBeacon('/api/ping');
+        });
+    </script>
+</body>
+</html>

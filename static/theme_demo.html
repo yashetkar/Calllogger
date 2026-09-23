@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Background Demo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .demo-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .demo-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .demo-title p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 40px 0 20px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .theme-section {
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .light-bg {
+            background-color: #f5f7fa;
+            border: 1px solid #e2e8f0;
+        }
+        .dark-bg {
+            background-color: #080b11;
+            border: 1px solid #1e293b;
+            color: #f8fafc;
+        }
+        .dark-bg .section-title {
+            border-bottom-color: #1e293b;
+        }
+        
+        .demo-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .demo-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-left: 5px;
+        }
+        .dark-bg .demo-label {
+            color: #94a3b8;
+        }
+        
+        /* App Header Base Demo (retaining all font/accents) */
+        .app-header-demo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        /* --- LIGHT THEME BG OPTIONS --- */
+        .app-header-demo.light-base {
+            --border: #e2e8f0;
+            --primary: #4f46e5;
+        }
+        .app-header-demo.light-base h1 { color: #0f172a; }
+        .app-header-demo.light-base .header-subtitle { color: #64748b; }
+        .app-header-demo.light-base .logo-icon svg { color: var(--primary); }
+
+        .bg-light-classic { background-color: rgba(255, 255, 255, 0.8); }
+        .bg-light-indigo { background-color: rgba(240, 244, 255, 0.8); }
+        .bg-light-slate { background-color: rgba(241, 245, 249, 0.85); }
+        .bg-light-teal { background-color: rgba(240, 253, 250, 0.8); }
+        .bg-light-amber { background-color: rgba(254, 252, 232, 0.8); }
+
+        /* --- DARK THEME BG OPTIONS --- */
+        .app-header-demo.dark-base {
+            --border: #1e293b;
+            --primary: #6366f1;
+        }
+        .app-header-demo.dark-base h1 { color: #f8fafc; }
+        .app-header-demo.dark-base .header-subtitle { color: #94a3b8; }
+        .app-header-demo.dark-base .logo-icon svg { color: var(--primary); }
+
+        .bg-dark-classic { background-color: rgba(17, 22, 37, 0.7); }
+        .bg-dark-indigo { background-color: rgba(26, 32, 53, 0.75); }
+        .bg-dark-jet { background-color: rgba(10, 10, 12, 0.85); }
+        .bg-dark-slate { background-color: rgba(20, 30, 45, 0.75); }
+        .bg-dark-teal { background-color: rgba(15, 25, 25, 0.75); }
+
+        /* Structural Styling */
+        .app-header-demo h1 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+        .app-header-demo .header-subtitle {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-top: 2px;
+        }
+        .metric-card-demo {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            display: flex;
+            flex-direction: column;
+            font-size: 10px;
+            background: rgba(100,116,139,0.03);
+            border-left: 3px solid #ccc;
+        }
+        .metric-card-demo.total { border-left-color: var(--primary); }
+        .metric-card-demo.open { border-left-color: #ef4444; }
+        .metric-card-demo.resolved { border-left-color: #10b981; }
+        
+        .metric-label-demo {
+            font-weight: 600;
+            color: #64748b;
+        }
+        .dark-base .metric-label-demo {
+            color: #94a3b8;
+        }
+        .metric-value-demo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .dark-base .metric-value-demo {
+            color: #f8fafc;
+        }
+        .clock-demo {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            color: #0f172a;
+            border-radius: 6px;
+        }
+        .dark-base .clock-demo {
+            color: #f8fafc;
+        }
+        .theme-btn-demo {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+        .dark-base .theme-btn-demo {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-title">
+            <h1>Header Background Showcases</h1>
+            <p>Compare background colors with the current fonts and primary branding accents kept exactly as they are.</p>
+        </div>
+
+        <!-- LIGHT MODE BG -->
+        <div class="theme-section light-bg">
+            <div class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #eab308;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                Light Mode Backgrounds
+            </div>
+
+            <!-- 1. Classic Light -->
+            <div class="demo-row">
+                <div class="demo-label">1. Classic White (Current) - rgba(255, 255, 255, 0.8)</div>
+                <div class="app-header-demo light-base bg-light-classic">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">🌙</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Soft Indigo Light -->
+            <div class="demo-row">
+                <div class="demo-label">2. Soft Indigo Light (Recommended) - rgba(240, 244, 255, 0.8)</div>
+                <div class="app-header-demo light-base bg-light-indigo">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">🌙</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Soft Slate Light -->
+            <div class="demo-row">
+                <div class="demo-label">3. Soft Slate Light - rgba(241, 245, 249, 0.85)</div>
+                <div class="app-header-demo light-base bg-light-slate">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">🌙</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Soft Teal Light -->
+            <div class="demo-row">
+                <div class="demo-label">4. Soft Teal Light - rgba(240, 253, 250, 0.8)</div>
+                <div class="app-header-demo light-base bg-light-teal">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">🌙</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Soft Amber Light -->
+            <div class="demo-row">
+                <div class="demo-label">5. Soft Amber Light - rgba(254, 252, 232, 0.8)</div>
+                <div class="app-header-demo light-base bg-light-amber">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">🌙</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DARK MODE BG -->
+        <div class="theme-section dark-bg">
+            <div class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #a5b4fc;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                Dark Mode Backgrounds
+            </div>
+
+            <!-- 1. Classic Dark -->
+            <div class="demo-row">
+                <div class="demo-label">1. Classic Charcoal (Current) - rgba(17, 22, 37, 0.7)</div>
+                <div class="app-header-demo dark-base bg-dark-classic">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">☀️</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Deep Indigo Dark -->
+            <div class="demo-row">
+                <div class="demo-label">2. Deep Indigo Dark (Recommended) - rgba(26, 32, 53, 0.75)</div>
+                <div class="app-header-demo dark-base bg-dark-indigo">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">☀️</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Midnight Jet Dark -->
+            <div class="demo-row">
+                <div class="demo-label">3. Midnight Jet Dark - rgba(10, 10, 12, 0.85)</div>
+                <div class="app-header-demo dark-base bg-dark-jet">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">☀️</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Nordic Slate Dark -->
+            <div class="demo-row">
+                <div class="demo-label">4. Nordic Slate Dark - rgba(20, 30, 45, 0.75)</div>
+                <div class="app-header-demo dark-base bg-dark-slate">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">☀️</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Dark Teal Dark -->
+            <div class="demo-row">
+                <div class="demo-label">5. Dark Teal Dark - rgba(15, 25, 25, 0.75)</div>
+                <div class="app-header-demo dark-base bg-dark-teal">
+                    <div class="header-logo">
+                        <span class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </span>
+                        <div class="header-titles">
+                            <h1>IT OPERATIONS CENTER</h1>
+                            <span class="header-subtitle">Helpdesk Call Logger</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel" style="display: flex; gap: 8px;">
+                        <div class="metric-card-demo total"><span class="metric-label-demo">TOTAL TICKETS</span><span class="metric-value-demo">17</span></div>
+                        <div class="metric-card-demo open"><span class="metric-label-demo">OPEN & IN PROGRESS</span><span class="metric-value-demo">5</span></div>
+                        <div class="metric-card-demo resolved"><span class="metric-label-demo">RESOLVED</span><span class="metric-value-demo">9</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="clock-demo">10:17:53 AM</div>
+                        <div class="theme-btn-demo">⚙️</div>
+                        <div class="theme-btn-demo">☀️</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
